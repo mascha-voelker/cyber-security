@@ -41,7 +41,7 @@ var username = sessionStorage.getItem('storyline_username');
 var player = GetPlayer();
 
 console.log("Retrieved username from sessionStorage:", username);
-console.log("API endpoint:", "https://portfolio-cyber-security.vercel.app/api");
+console.log("API endpoint:", "https://cyber-security-sage.vercel.app/api");
 
 if (!username) {
     alert("No username found. Please go back and enter a username.");
@@ -54,7 +54,7 @@ console.log("Starting video generation for:", username);
 player.SetVar("LoadingMessage", "Generating your personalized video...");
 
 // API base URL - MOVED TO GLOBAL SCOPE
-var apiBase = "https://portfolio-cyber-security.vercel.app/api";
+var apiBase = "https://cyber-security-sage.vercel.app/api";
 
 // Function to check video status - MOVED INSIDE Script2 AND FIXED
 function checkVideoStatus(videoId) {
