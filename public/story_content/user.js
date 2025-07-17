@@ -56,7 +56,7 @@ player.SetVar("LoadingMessage", "Generating your personalized video...");
 // API base URL - MOVED TO GLOBAL SCOPE
 var apiBase = "https://cyber-security-sage.vercel.app/api";
 
-// Function to check video status - MOVED INSIDE Script2 AND FIXED
+// Function to check video status - IMPROVED VERSION
 function checkVideoStatus(videoId) {
     console.log("Checking video status for ID:", videoId);
     
@@ -74,14 +74,17 @@ function checkVideoStatus(videoId) {
                 sessionStorage.setItem('storyline_video_url', data.video_url);
                 player.SetVar("LoadingMessage", "Video ready! Loading...");
                 
-                // FIXED: Set the VideoURL variable properly
+                // Set the VideoURL variable properly
                 player.SetVar("VideoURL", data.video_url);
+                
+                // IMPROVED: Create video element immediately instead of waiting for next slide
+                createVideoElement(data.video_url);
                 
                 // Go to next slide after short delay
                 setTimeout(() => {
                     console.log("Jumping to next slide with video URL:", data.video_url);
                     player.SetVar("JumpToNextSlide", true);
-                }, 1000);
+                }, 2000); // Increased delay to 2 seconds
                 
             } else if (data.status === "failed") {
                 console.log("Video generation failed");
@@ -100,6 +103,62 @@ function checkVideoStatus(videoId) {
         console.error("Error checking video status:", error);
         player.SetVar("LoadingMessage", "Error checking video status. Please try again.");
     });
+}
+
+// IMPROVED: Function to create video element
+function createVideoElement(videoUrl) {
+    console.log("Creating video element with URL:", videoUrl);
+    
+    // Remove any existing video elements
+    var existingVideo = document.getElementById('storyline-custom-video');
+    if (existingVideo) {
+        existingVideo.remove();
+    }
+    
+    // Create video element
+    var videoElement = document.createElement('video');
+    videoElement.id = 'storyline-custom-video';
+    videoElement.width = 640;
+    videoElement.height = 360;
+    videoElement.controls = true;
+    videoElement.autoplay = true;
+    videoElement.src = videoUrl;
+    videoElement.style.maxWidth = '100%';
+    videoElement.style.height = 'auto';
+    
+    // Create container
+    var container = document.createElement('div');
+    container.id = 'storyline-video-container';
+    container.style.position = 'fixed';
+    container.style.top = '50%';
+    container.style.left = '50%';
+    container.style.transform = 'translate(-50%, -50%)';
+    container.style.zIndex = '9999';
+    container.style.backgroundColor = 'rgba(0,0,0,0.9)';
+    container.style.padding = '20px';
+    container.style.borderRadius = '10px';
+    container.style.textAlign = 'center';
+    
+    // Add close button
+    var closeButton = document.createElement('button');
+    closeButton.innerHTML = '✕ Close';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.background = 'rgba(255,255,255,0.8)';
+    closeButton.style.border = 'none';
+    closeButton.style.padding = '5px 10px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.borderRadius = '5px';
+    closeButton.onclick = function() {
+        container.remove();
+    };
+    
+    container.appendChild(closeButton);
+    container.appendChild(videoElement);
+    document.body.appendChild(container);
+    
+    console.log("Video element created and added to page");
 }
 
 // Step 1: Generate script
@@ -162,29 +221,14 @@ var videoURL = player.GetVar("VideoURL");
 console.log("Script3 called, VideoURL:", videoURL);
 
 if (videoURL && videoURL !== "" && videoURL !== null) {
-    console.log("Creating video element with URL:", videoURL);
-    
-    // Create video element
-    var videoHTML = '<video width="640" height="360" controls autoplay>' +
-                   '<source src="' + videoURL + '" type="video/mp4">' +
-                   'Your browser does not support the video tag.' +
-                   '</video>';
-    
-    // Find a container to put the video in
-    var container = document.createElement('div');
-    container.innerHTML = videoHTML;
-    container.style.position = 'absolute';
-    container.style.top = '50%';
-    container.style.left = '50%';
-    container.style.transform = 'translate(-50%, -50%)';
-    container.style.zIndex = '9999';
-    container.style.backgroundColor = 'rgba(0,0,0,0.8)';
-    container.style.padding = '20px';
-    container.style.borderRadius = '10px';
-    
-    document.body.appendChild(container);
-    
-    console.log("Video element created and added to page");
+    // Video should already be created by Script2, but create it again if needed
+    var existingVideo = document.getElementById('storyline-custom-video');
+    if (!existingVideo) {
+        console.log("No existing video found, creating new one");
+        createVideoElement(videoURL);
+    } else {
+        console.log("Video already exists on page");
+    }
 } else {
     console.log("No video URL available, VideoURL:", videoURL);
     
@@ -193,12 +237,67 @@ if (videoURL && videoURL !== "" && videoURL !== null) {
     if (backupURL) {
         console.log("Found backup URL in session storage:", backupURL);
         player.SetVar("VideoURL", backupURL);
-        // Retry Script3
-        setTimeout(() => window.Script3(), 500);
+        createVideoElement(backupURL);
     } else {
         console.log("No backup URL found either");
     }
 }
+}
+
+// Helper function available globally
+function createVideoElement(videoUrl) {
+    console.log("Creating video element with URL:", videoUrl);
+    
+    // Remove any existing video elements
+    var existingVideo = document.getElementById('storyline-custom-video');
+    if (existingVideo) {
+        existingVideo.remove();
+    }
+    
+    // Create video element
+    var videoElement = document.createElement('video');
+    videoElement.id = 'storyline-custom-video';
+    videoElement.width = 640;
+    videoElement.height = 360;
+    videoElement.controls = true;
+    videoElement.autoplay = true;
+    videoElement.src = videoUrl;
+    videoElement.style.maxWidth = '100%';
+    videoElement.style.height = 'auto';
+    
+    // Create container
+    var container = document.createElement('div');
+    container.id = 'storyline-video-container';
+    container.style.position = 'fixed';
+    container.style.top = '50%';
+    container.style.left = '50%';
+    container.style.transform = 'translate(-50%, -50%)';
+    container.style.zIndex = '9999';
+    container.style.backgroundColor = 'rgba(0,0,0,0.9)';
+    container.style.padding = '20px';
+    container.style.borderRadius = '10px';
+    container.style.textAlign = 'center';
+    
+    // Add close button
+    var closeButton = document.createElement('button');
+    closeButton.innerHTML = '✕ Close';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.background = 'rgba(255,255,255,0.8)';
+    closeButton.style.border = 'none';
+    closeButton.style.padding = '5px 10px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.borderRadius = '5px';
+    closeButton.onclick = function() {
+        container.remove();
+    };
+    
+    container.appendChild(closeButton);
+    container.appendChild(videoElement);
+    document.body.appendChild(container);
+    
+    console.log("Video element created and added to page");
 }
 
 };
