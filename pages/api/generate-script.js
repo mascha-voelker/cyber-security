@@ -108,9 +108,10 @@ export default async function handler(req, res) {
     A user has shared their strategies for spotting phishing emails: "${userStrategies}"
 
     Please provide constructive feedback on their strategies. Your response should:
-      - Repeat shortly that your colleague Cillian asked the user to note what tactics they use hackers use to make phishing emails seem real. Summarise their answer shortly.
+      - Greet ${username}. Then, mention shortly that your colleague Cillian asked the user to note what tactics they use hackers use to make phishing emails seem real. Summarise their answer shortly.
       - Acknowledge what they got right
-      - Gently correct any misconceptions  - Tell them that they will learn the major strategies in this learning experience 
+      - Gently correct any misconceptions
+      - Tell them that they will learn the major strategies in this learning experience 
       - Stay in character as Graham from IT 
       - Keep it conversational and encouraging. Your script will be transferred into a video so don't end it like you would a letter.
 
