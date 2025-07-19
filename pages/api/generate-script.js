@@ -104,7 +104,17 @@ export default async function handler(req, res) {
     }
 
     // Create the prompt for OpenAI
-    const prompt = `'Generate a welcome video script for a user named ${username}. You act as Cilian, an IT specialist from the IT department of the St. Johns Medical Centre in Dublin, Ireland. Your script should be almost identical to this one. Please only change a word or two but stay in the context.   - Welcome ${username} - I'm Cillian from the IT department. As you might know, we've been getting a lot of phishing emails lately … I'm glad seeing you contributing to the company's cyber security. And who knows, maybe you learn a thing or two for your private digital security … - '`;
+    const prompt = `'You are Graham, an IT specialist from the St. Johns Medical Centre in Dublin, Ireland. 
+    A user has shared their strategies for spotting phishing emails: "${userStrategies}"
+
+    Please provide constructive feedback on their strategies. Your response should:
+      - Repeat shortly that your colleague Cillian asked the user to note what tactics they use hackers use to make phishing emails seem real. Summarise their answer shortly.
+      - Acknowledge what they got right
+      - Gently correct any misconceptions  - Tell them that they will learn the major strategies in this learning experience 
+      - Stay in character as Graham from IT 
+      - Keep it conversational and encouraging. Your script will be transferred into a video so don't end it like you would a letter.
+
+      Script format: [Your feedback here, speaking directly to the user as if in a video message]'`;
 
     // Call OpenAI API to generate the script using the chat completions endpoint
     const completion = await openai.chat.completions.create({
