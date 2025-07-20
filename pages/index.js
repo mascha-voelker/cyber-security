@@ -1,17 +1,18 @@
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+
 export default function Home() {
+  const router = useRouter()
+
+  useEffect(() => {
+    // Redirect to the Storyline file
+    window.location.href = '/story.html'
+  }, [])
+
   return (
-    <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0 }}>
-      <iframe 
-        src="/story.html" 
-        style={{ 
-          width: '100%', 
-          height: '100%', 
-          border: 'none',
-          margin: 0,
-          padding: 0
-        }}
-        title="Cyber Security Course"
-      />
+    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      <h2>Loading Cyber Security Course...</h2>
+      <p>If you're not redirected automatically, <a href="/story.html">click here</a></p>
     </div>
   )
 }
