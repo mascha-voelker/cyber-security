@@ -173,6 +173,26 @@ window.Script3 = function()
   }
 }
 
+// Add this as Script4 (after your existing scripts)
+window.Script4 = function()
+{
+  var player = GetPlayer();
+  var username = player.GetVar("userName");
+
+  if (!username || username.trim() === "") {
+      alert("Please enter a username first!");
+      return;
+  }
+
+  sessionStorage.setItem('storyline_username', username.trim());
+  console.log("Username captured:", username);
+  
+  player.SetVar("JumpToNextSlide", false);
+  setTimeout(function() {
+      player.SetVar("JumpToNextSlide", true);
+  }, 100);
+}
+
 // Helper function to create video modal
 function createVideoElement(videoUrl) {
     console.log("Creating video element with URL:", videoUrl);
