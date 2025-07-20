@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "pages/api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/story.html",
+      "destination": "/story.html"
+    },
+    {
+      "source": "/story_content/(.*)",
+      "destination": "/story_content/$1"
+    }
+  ]
+}
