@@ -17,6 +17,33 @@ var slideHeight = player.slideHeight;
 // Global variables for video management
 window.videoPollingInterval = null;
 window.currentVideoId = null;
+window.isCheckingVideo = false;
+
+// Add connection recovery listener
+window.addEventListener('online', function() {
+    console.log("Connection restored!");
+    var videoId = sessionStorage.getItem('storyline_video_id');
+    var videoReady = sessionStorage.getItem('storyline_video_url');
+    
+    if (videoId && !videoReady && window.isCheckingVideo) {
+        console.log("Resuming video status check after reconnection");
+        var player = GetPlayer();
+        player.SetVar("LoadingMessage", "Connection restored. Checking video status...");
+        
+        // Resume checking with a fresh start
+        setTimeout(() => {
+            checkVideoStatus(videoId, 0);
+        }, 1000);
+    }
+});
+
+window.addEventListener('offline', function() {
+    console.log("Connection lost!");
+    if (window.isCheckingVideo) {
+        var player = GetPlayer();
+        player.SetVar("LoadingMessage", "Connection lost. Will resume when reconnected...");
+    }
+});
 
 // SCRIPT 1: Username capture and validation
 window.Script1 = function()
@@ -83,11 +110,14 @@ window.Script3 = function()
 
   console.log("Starting video generation for strategies:", userStrategies.substring(0, 100) + "...");
   player.SetVar("LoadingMessage", "Analyzing your strategies and generating feedback video...");
+  
+  // Mark that we're checking video status
+  window.isCheckingVideo = true;
 
   var apiBase = "https://cyber-security-sage.vercel.app/api";
 
-  function checkVideoStatus(videoId) {
-      console.log("Checking video status for ID:", videoId);
+  function checkVideoStatus(videoId, retryCount = 0) {
+      console.log("Checking video status for ID:", videoId, "Retry:", retryCount);
       
       fetch(apiBase + "/get-video?video_id=" + videoId)
       .then(response => response.json())
@@ -104,6 +134,9 @@ window.Script3 = function()
                   player.SetVar("VideoURL", data.video_url);
                   createVideoElement(data.video_url);
                   
+                  // Mark that we're done checking
+                  window.isCheckingVideo = false;
+                  
                   setTimeout(() => {
                       console.log("Jumping to next slide with video URL:", data.video_url);
                       player.SetVar("JumpToNextSlide", true);
@@ -112,9 +145,10 @@ window.Script3 = function()
               } else if (data.status === "failed") {
                   console.log("Video generation failed");
                   player.SetVar("LoadingMessage", "Video generation failed. Please try again.");
+                  window.isCheckingVideo = false;
               } else {
                   console.log("Video still processing, checking again in 3 seconds");
-                  setTimeout(() => checkVideoStatus(videoId), 3000);
+                  setTimeout(() => checkVideoStatus(videoId, 0), 3000);
               }
           } else {
               console.error("API returned success: false", data);
@@ -123,7 +157,25 @@ window.Script3 = function()
       })
       .catch(error => {
           console.error("Error checking video status:", error);
-          player.SetVar("LoadingMessage", "Error checking video status. Please try again.");
+          
+          // Handle connection errors with exponential backoff
+          if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+              console.log("Connection error detected, attempting retry...");
+              
+              if (retryCount < 10) { // Maximum 10 retries
+                  var delay = Math.min(1000 * Math.pow(2, retryCount), 30000); // Max 30 seconds
+                  player.SetVar("LoadingMessage", "Connection lost. Retrying in " + Math.round(delay/1000) + " seconds...");
+                  
+                  setTimeout(() => {
+                      player.SetVar("LoadingMessage", "Reconnecting... Checking video status.");
+                      checkVideoStatus(videoId, retryCount + 1);
+                  }, delay);
+              } else {
+                  player.SetVar("LoadingMessage", "Connection issues persist. Please check your internet and refresh the page.");
+              }
+          } else {
+              player.SetVar("LoadingMessage", "Error checking video status. Please try again.");
+          }
       });
   }
 
