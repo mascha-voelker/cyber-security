@@ -1,22 +1,17 @@
-import Head from 'next/head'
-
-export default function Home() {
+export default function Storyline() {
   return (
-    <>
-      <Head>
-        <title>Cyber Security Training</title>
-      </Head>
-      <div style={{ width: '100%', height: '100vh' }}>
-        <iframe 
-          src="/story.html" 
-          style={{ 
-            width: '100%', 
-            height: '100%', 
-            border: 'none' 
-          }}
-          title="Cyber Security Course"
-        />
-      </div>
-    </>
+    <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0 }}>
+      <iframe 
+        src="/story.html" 
+        style={{ 
+          width: '100%', 
+          height: '100%', 
+          border: 'none',
+          margin: 0,
+          padding: 0
+        }}
+        title="Cyber Security Course"
+      />
+    </div>
   )
 }
