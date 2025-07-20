@@ -1,31 +1,17 @@
-import { useState, useEffect } from 'react'
-
 export default function Course() {
-  const [content, setContent] = useState('')
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Fetch the story.html content
-    fetch('/api/get-storyline')
-      .then(response => response.text())
-      .then(html => {
-        setContent(html)
-        setLoading(false)
-      })
-      .catch(error => {
-        console.error('Error loading course:', error)
-        setLoading(false)
-      })
-  }, [])
-
-  if (loading) {
-    return <div>Loading course...</div>
-  }
-
   return (
-    <div 
-      dangerouslySetInnerHTML={{ __html: content }}
-      style={{ width: '100%', height: '100vh' }}
-    />
+    <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0 }}>
+      <iframe 
+        src="/story.html" 
+        style={{ 
+          width: '100%', 
+          height: '100%', 
+          border: 'none',
+          margin: 0,
+          padding: 0
+        }}
+        title="Cyber Security Course"
+      />
+    </div>
   )
 }
